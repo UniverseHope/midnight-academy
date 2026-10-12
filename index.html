@@ -1,0 +1,554 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Midnight Academy</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #101827;
+      color: #e8edff;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    button {
+      border: 1px solid #485b80;
+      border-radius: 7px;
+      padding: 8px 10px;
+      background: #293954;
+      color: #edf1ff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #3a4d70;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 20px 24px;
+      border-bottom: 1px solid #293650;
+    }
+
+    .brand {
+      margin: 0;
+      color: #c7d2fe;
+      font-size: 24px;
+    }
+
+    .subtitle,
+    .muted {
+      color: #aab7d4;
+      font-size: 13px;
+    }
+
+    .turn-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .notice {
+      margin: 18px 24px;
+      padding: 14px 16px;
+      border: 1px solid #394c70;
+      border-radius: 10px;
+      background: #182338;
+      color: #c7d2fe;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(190px, 0.85fr)
+                             minmax(280px, 1.4fr)
+                             minmax(200px, 0.9fr);
+      gap: 16px;
+      padding: 0 24px 24px;
+    }
+
+    .panel {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid #293650;
+      border-radius: 12px;
+      background: #151f31;
+    }
+
+    .panel h2 {
+      margin: 0 0 14px;
+      font-size: 17px;
+      color: #dbe4ff;
+    }
+
+    .subject-card,
+    .tech-node {
+      margin-bottom: 9px;
+      padding: 12px;
+      border: 1px solid #354563;
+      border-radius: 8px;
+      background: #1c2a40;
+    }
+
+    .subject-name {
+      font-weight: 600;
+    }
+
+    .level {
+      margin-top: 5px;
+      color: #aab7d4;
+      font-size: 12px;
+    }
+
+    .subject-card button {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .tech-map {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .tech-node {
+      margin: 0;
+      min-height: 64px;
+      text-align: center;
+      color: #dce5ff;
+      cursor: pointer;
+    }
+
+    .tech-node.locked {
+      opacity: 0.55;
+      border-style: dashed;
+    }
+
+    .tech-node.selected {
+      border-color: #a5b4fc;
+      background: #303e60;
+      box-shadow: 0 0 0 1px #a5b4fc;
+    }
+
+    .tech-type {
+      display: block;
+      margin-top: 6px;
+      color: #aab7d4;
+      font-size: 11px;
+    }
+
+    .detail-name {
+      margin: 8px 0 14px;
+      font-size: 22px;
+      color: #c7d2fe;
+    }
+
+    .detail-line {
+      margin: 12px 0;
+      color: #c5cee3;
+      font-size: 14px;
+    }
+
+    .detail-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .footer {
+      padding: 16px 24px;
+      border-top: 1px solid #293650;
+      color: #8493b4;
+      font-size: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .detail-panel {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .layout {
+        grid-template-columns: 1fr;
+        padding: 0 14px 18px;
+      }
+
+      .notice {
+        margin: 14px;
+      }
+
+      .topbar {
+        padding: 16px;
+      }
+
+      .detail-panel {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div>
+      <h1 class="brand">The Midnight Academy</h1>
+      <div class="subtitle">午夜学院 · 科技研究网络</div>
+    </div>
+
+    <div class="turn-info">
+      <span>第 <strong id="turn">1</strong> 回合</span>
+      <span>研究点：<strong id="points">10</strong></span>
+      <button id="end-turn">结束回合</button>
+    </div>
+  </header>
+
+  <div class="notice">
+    <strong>研究提示</strong>
+    <p>发展某些学科，可能会促进其他学科的发展速度。</p >
+  </div>
+
+  <main class="layout">
+    <section class="panel">
+      <h2>基础学科</h2>
+      <div id="subjects"></div>
+    </section>
+
+    <section class="panel">
+      <h2>科技网络</h2>
+      <p class="muted">选择一个节点，查看研究条件。</p >
+      <div id="tech-map" class="tech-map"></div>
+    </section>
+
+    <section class="panel detail-panel">
+      <h2>研究详情</h2>
+      <div id="details">
+        <p class="muted">请先选择一个研究节点。</p >
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    The Midnight Academy · 互动研究原型
+  </footer>
+
+<script>
+ const subjects = [
+  { id: "math", name: "数学", level: 1, progress: 0 },
+  { id: "physics", name: "物理学", level: 1, progress: 0 },
+  { id: "cs", name: "计算机科学", level: 1, progress: 0 },
+  { id: "biology", name: "生物学", level: 1, progress: 0 },
+  { id: "chemistry", name: "化学", level: 1, progress: 0 },
+  { id: "control", name: "电子与控制工程", level: 1, progress: 0 }
+];
+
+  // 跨学科研究与十项目标科技
+  const technologies = [
+    {
+      id: "materials",
+      name: "材料科学",
+      type: "跨学科研究",
+      conditions: ["物理学 Lv.2", "化学 Lv.2"]
+    },
+    {
+      id: "ai",
+      name: "人工智能",
+      type: "跨学科研究",
+      conditions: ["数学 Lv.2", "计算机科学 Lv.2"]
+    },
+    {
+      id: "bci",
+      name: "脑机接口",
+      type: "目标科技",
+      conditions: ["生物学 Lv.2", "电子与控制工程 Lv.2"]
+    },
+    {
+      id: "embodied",
+      name: "具身智能",
+      type: "目标科技",
+      conditions: ["人工智能", "电子与控制工程 Lv.2"]
+    },
+    {
+      id: "arvr",
+      name: "AR/VR",
+      type: "目标科技",
+      conditions: ["计算机科学 Lv.2", "电子与控制工程 Lv.2"]
+    },
+    {
+      id: "spaceplane",
+      name: "空天飞机",
+      type: "目标科技",
+      conditions: [
+        "数学 Lv.2",
+        "物理学 Lv.2",
+        "电子与控制工程 Lv.2",
+        "材料科学"
+      ]
+    },
+    {
+      id: "gene",
+      name: "基因治疗 / 改进",
+      type: "目标科技",
+      conditions: ["生物学 Lv.2", "化学 Lv.2"]
+    },
+    {
+      id: "recycling",
+      name: "资源再生",
+      type: "目标科技",
+      conditions: ["化学 Lv.2", "计算机科学 Lv.2"]
+    },
+    {
+      id: "fusion",
+      name: "可控核聚变",
+      type: "目标科技",
+      conditions: [
+        "物理学 Lv.2",
+        "化学 Lv.2",
+        "材料科学",
+        "电子与控制工程 Lv.2"
+      ]
+    },
+    {
+      id: "agi",
+      name: "通用人工智能（AGI）",
+      type: "目标科技",
+      conditions: ["数学 Lv.3", "计算机科学 Lv.3", "人工智能 Lv.2"]
+    },
+    {
+      id: "quantum",
+      name: "量子科技",
+      type: "目标科技",
+      conditions: [
+        "数学 Lv.2",
+        "物理学 Lv.2",
+        "材料科学",
+        "电子与控制工程 Lv.2"
+      ]
+    },
+    {
+      id: "sixg",
+      name: "6G",
+      type: "目标科技",
+      conditions: [
+        "数学 Lv.2",
+        "物理学 Lv.2",
+        "计算机科学 Lv.2",
+        "电子与控制工程 Lv.2"
+      ]
+    }
+  ];
+
+  // 当前选中的研究节点
+  let selectedNodeId = "math";
+  // 游戏回合状态
+let currentTurn = 1;
+let researchPoints = 10;
+
+// 学科升级所需进度
+function getUpgradeCost(level) {
+  return level === 1 ? 8 : 12;
+}
+
+// 更新顶部的回合数和研究点
+function renderGameStatus() {
+  document.getElementById("turn").textContent = currentTurn;
+  document.getElementById("points").textContent = researchPoints;
+}
+
+  // 找到网页中的显示区域
+  const subjectsContainer = document.getElementById("subjects");
+  const techMap = document.getElementById("tech-map");
+  const details = document.getElementById("details");
+
+  // 动态显示六门基础学科
+function renderSubjects() {
+  subjectsContainer.innerHTML = "";
+
+  subjects.forEach((subject) => {
+    const card = document.createElement("div");
+    card.className = "subject-card";
+
+    if (selectedNodeId === subject.id) {
+      card.style.borderColor = "#a5b4fc";
+    }
+
+    const upgradeCost = getUpgradeCost(subject.level);
+
+    card.innerHTML = `
+      <div class="subject-name">${subject.name}</div>
+      <div class="level">当前等级：Lv.${subject.level}</div>
+      <div class="level">
+        升级进度：${subject.progress} / ${upgradeCost}
+      </div>
+      <button type="button" class="select-subject">查看学科</button>
+      <div class="detail-actions">
+        <button type="button" class="invest-one">投入 1 点</button>
+        <button type="button" class="invest-five">投入 5 点</button>
+      </div>
+    `;
+
+    card.querySelector(".select-subject").addEventListener("click", () => {
+      selectedNodeId = subject.id;
+      renderSubjects();
+      renderTechnologies();
+      renderDetails();
+    });
+
+    card.querySelector(".invest-one").addEventListener("click", () => {
+      investInSubject(subject.id, 1);
+    });
+
+    card.querySelector(".invest-five").addEventListener("click", () => {
+      investInSubject(subject.id, 5);
+    });
+
+    subjectsContainer.appendChild(card);
+  });
+}
+// 向基础学科投入研究点
+function investInSubject(subjectId, amount) {
+  const subject = subjects.find(
+    (item) => item.id === subjectId
+  );
+
+  if (!subject) {
+    return;
+  }
+
+  // 检查本回合的研究点是否足够
+  if (researchPoints < amount) {
+    alert("研究点不足！请减少投入，或结束回合进入下一轮。");
+    return;
+  }
+
+  // 扣除研究点，增加学科进度
+  researchPoints -= amount;
+  subject.progress += amount;
+
+  // 如果进度足够，就升级学科
+  while (subject.progress >= getUpgradeCost(subject.level)) {
+    subject.progress -= getUpgradeCost(subject.level);
+    subject.level += 1;
+  }
+
+  // 刷新界面
+  renderGameStatus();
+  renderSubjects();
+  renderDetails();
+}
+
+// 结束当前回合
+document.getElementById("end-turn").addEventListener("click", () => {
+  currentTurn += 1;
+
+  // 上回合剩余研究点清零，新回合固定获得 10 点
+  researchPoints = 10;
+
+  renderGameStatus();
+  renderSubjects();
+  renderTechnologies();
+  renderDetails();
+});
+  // 动态显示科技网络
+  function renderTechnologies() {
+    techMap.innerHTML = "";
+
+    technologies.forEach((tech) => {
+      const node = document.createElement("button");
+      node.type = "button";
+      node.className = "tech-node";
+
+      if (selectedNodeId === tech.id) {
+        node.classList.add("selected");
+      }
+
+      node.innerHTML = `
+        <span>${tech.name}</span>
+        <span class="tech-type">${tech.type}</span>
+      `;
+
+      node.addEventListener("click", () => {
+        selectedNodeId = tech.id;
+        renderTechnologies();
+        renderSubjects();
+        renderDetails();
+      });
+
+      techMap.appendChild(node);
+    });
+  }
+
+  // 显示所选节点的详情
+  function renderDetails() {
+    const subject = subjects.find(
+      (item) => item.id === selectedNodeId
+    );
+
+    const tech = technologies.find(
+      (item) => item.id === selectedNodeId
+    );
+
+        if (subject) {
+      const upgradeCost = getUpgradeCost(subject.level);
+
+      details.innerHTML = `
+        <div class="detail-name">${subject.name}</div>
+        <div class="detail-line">类型：基础学科</div>
+        <div class="detail-line">当前等级：Lv.${subject.level}</div>
+        <div class="detail-line">
+          升级进度：${subject.progress} / ${upgradeCost}
+        </div>
+        <div class="detail-line">
+          当前回合剩余研究点：${researchPoints}
+        </div>
+        <div class="detail-line">
+          达到升级门槛后，学科自动升级。
+        </div>
+      `;
+      return;
+    }
+
+    if (tech) {
+      details.innerHTML = `
+        <div class="detail-name">${tech.name}</div>
+        <div class="detail-line">类型：${tech.type}</div>
+        <div class="detail-line">当前等级：尚未开始</div>
+        <div class="detail-line">
+          <strong>解锁条件</strong>
+        </div>
+        <ul>
+          ${tech.conditions.map(
+            (condition) => `<li>${condition}</li>`
+          ).join("")}
+        </ul>
+      `;
+    }
+  }
+
+    // 初始化页面
+  renderGameStatus();
+  renderSubjects();
+  renderTechnologies();
+  renderDetails();
+</script>
+</body>
+</html>
+
+</body>
+</html>
