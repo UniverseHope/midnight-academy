@@ -45,6 +45,10 @@
       <button id="end-turn">
         END TURN
       </button>
+      <button onclick="showBreakthrough('agi')">
+TEST AGI
+</button>
+      
 
     </div>
 
@@ -78,9 +82,120 @@
 
   <footer class="footer">
     The Midnight Academy · 互动研究原型
-  </footer>
+</footer>
+
+
+<!-- 科技突破事件窗口 -->
+<div id="breakthrough-overlay">
+
+    <div class="breakthrough-box">
+
+        <div class="breakthrough-title">
+            SYSTEM BREAKTHROUGH
+        </div>
+
+
+        <div id="breakthrough-tech">
+            ARTIFICIAL GENERAL INTELLIGENCE
+        </div>
+
+
+        <div id="breakthrough-text">
+            新时代的序幕已经开启。
+        </div>
+
+    </div>
+
+</div>
 
 <script>
+ const breakthroughEvents = {
+
+  agi: {
+
+    title:
+    "ARTIFICIAL GENERAL INTELLIGENCE",
+
+    text:
+    `
+    新时代的序幕已经开启。
+
+    人类第一次创造出能够跨越领域、
+    持续学习并自主解决复杂问题的智能系统。
+
+    AI时代结束。
+
+    AGI时代开始。
+    `
+
+  },
+
+
+  quantum: {
+
+    title:
+    "QUANTUM TECHNOLOGY",
+
+    text:
+    `
+    微观世界的规则，
+    开始成为人类文明的新工具。
+
+    信息、计算与测量，
+    正进入量子时代。
+    `
+
+  },
+
+
+  fusion: {
+
+    title:
+    "CONTROLLED NUCLEAR FUSION",
+
+    text:
+    `
+    人类第一次掌握恒星内部的能量。
+
+    能源限制，
+    开始逐渐退出文明发展的舞台。
+    `
+
+  },
+
+
+  bci: {
+
+    title:
+    "BRAIN COMPUTER INTERFACE",
+
+    text:
+    `
+    思维与机器之间，
+    第一座桥梁已经建立。
+
+    人类开始重新定义自身边界。
+    `
+
+  },
+
+
+  embodiment: {
+
+    title:
+    "EMBODIED INTELLIGENCE",
+
+    text:
+    `
+    智能第一次拥有真正的身体。
+
+    机器开始理解、
+    学习并参与现实世界。
+    `
+
+  }
+
+};
  const subjects = [
   { id: "math", name: "数学", level: 1, progress: 0 },
   { id: "physics", name: "物理学", level: 1, progress: 0 },
@@ -325,6 +440,56 @@ document.getElementById("end-turn").addEventListener("click", () => {
       techMap.appendChild(node);
     });
   }
+  function showBreakthrough(eventID){
+
+
+  const event =
+  breakthroughEvents[eventID];
+
+
+  if(!event){
+    return;
+  }
+
+
+  document.getElementById(
+    "breakthrough-tech"
+  ).innerText =
+  event.title;
+
+
+
+  document.getElementById(
+    "breakthrough-text"
+  ).innerText =
+  event.text;
+
+
+
+  const overlay =
+  document.getElementById(
+  "breakthrough-overlay"
+  );
+
+
+  overlay.classList.add(
+  "active"
+  );
+
+
+
+  setTimeout(()=>{
+
+
+    overlay.classList.remove(
+    "active"
+    );
+
+
+  },3000);
+
+
+}
 
   // 显示所选节点的详情
   function renderDetails() {
@@ -378,6 +543,53 @@ document.getElementById("end-turn").addEventListener("click", () => {
   renderSubjects();
   renderTechnologies();
   renderDetails();
+function showBreakthrough(){
+
+    const overlay =
+    document.getElementById(
+    "breakthrough-overlay"
+    );
+
+
+    const tech =
+    document.getElementById(
+    "breakthrough-tech"
+    );
+
+
+    const text =
+    document.getElementById(
+    "breakthrough-text"
+    );
+
+
+    tech.innerHTML =
+    "ARTIFICIAL GENERAL INTELLIGENCE";
+
+
+    text.innerHTML =
+    `
+    新时代的序幕已经开启。<br><br>
+
+    人类第一次创造出能够跨越领域、
+    持续学习并自主解决复杂问题的智能系统。<br><br>
+
+    AI时代结束。<br><br>
+
+    AGI时代开始。
+    `;
+
+
+    overlay.classList.add("active");
+
+
+    setTimeout(()=>{
+
+        overlay.classList.remove("active");
+
+    },3000);
+
+}
 </script>
 </body>
 </html>
