@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 
-<<body>
+<body>
 
   <header class="topbar">
 
@@ -102,8 +102,6 @@
       id: "ai",
       name: "人工智能",
       type: "跨学科研究",
-      x:45,
-      y:25,
       conditions: ["数学 Lv.2", "计算机科学 Lv.2"]
     },
     {
@@ -307,12 +305,11 @@ document.getElementById("end-turn").addEventListener("click", () => {
       const node = document.createElement("button");
       node.type = "button";
       node.className = "tech-node";
-      node.style.position = "absolute"
 
       if (selectedNodeId === tech.id) {
         node.classList.add("selected");
       }
-      
+
       node.innerHTML = `
         <span>${tech.name}</span>
         <span class="tech-type">${tech.type}</span>
@@ -385,5 +382,3 @@ document.getElementById("end-turn").addEventListener("click", () => {
 </body>
 </html>
 
-</body>
-</html>
