@@ -30,7 +30,7 @@
     <div class="turn-info">
 
       <span>
-        YEAR <strong id="year">2100</strong>
+        YEAR <strong id="year">2000</strong>
       </span>
 
       <span>
@@ -46,7 +46,7 @@
         END TURN
       </button>
       <button onclick="showBreakthrough('agi')">
-TEST AGI
+TEST BREAKTHROUGH
 </button>
       
 
@@ -196,6 +196,8 @@ TEST AGI
   }
 
 };
+// 已触发突破事件记录
+const triggeredBreakthroughs = {};
  const subjects = [
   { id: "math", name: "数学", level: 1, progress: 0 },
   { id: "physics", name: "物理学", level: 1, progress: 0 },
@@ -301,21 +303,117 @@ TEST AGI
     }
   ];
 
+ // 初始化科技状态
+technologies.forEach((tech) => {
+  tech.level = 0;
+  tech.progress = 0;
+  tech.unlocked = false;
+});
+
   // 当前选中的研究节点
   let selectedNodeId = "math";
   // 游戏回合状态
 let currentTurn = 1;
 let researchPoints = 10;
+let gameEnded = false;
 
 // 学科升级所需进度
 function getUpgradeCost(level) {
   return level === 1 ? 8 : 12;
 }
 
+ // 科技研究所需进度
+function getTechnologyUpgradeCost(level) {
+  return level === 0 ? 8 : 12;
+}
+
+// 检查科技的解锁条件
+
+function canUnlockTechnology(tech) {
+  return tech.conditions.every((condition) => {
+    const match = condition.match(/^(.+?)\s+Lv\.(\d+)$/);
+
+    if (match) {
+      const name = match[1];
+      const requiredLevel = Number(match[2]);
+
+      // 优先检查基础学科
+      const subject = subjects.find(
+        (item) => item.name === name
+      );
+
+      if (subject) {
+        return subject.level >= requiredLevel;
+      }
+
+      // 如果不是基础学科，再检查前置科技
+      const prerequisiteTech = technologies.find(
+        (item) => item.name === name
+      );
+
+      return !!prerequisiteTech &&
+        prerequisiteTech.unlocked &&
+        prerequisiteTech.level >= requiredLevel;
+    }
+
+    // 不带等级的条件，视为前置科技
+    const prerequisiteTech = technologies.find(
+      (item) => item.name === condition
+    );
+
+    return !!prerequisiteTech &&
+      prerequisiteTech.unlocked &&
+      prerequisiteTech.level >= 1;
+  });
+}
+
+// 向科技投入研究点
+function investInTechnology(techId, amount) {
+  if (gameEnded) return;
+  const tech = technologies.find(
+    (item) => item.id === techId
+  );
+
+  if (!tech) return;
+
+  if (researchPoints < amount) {
+    alert("研究点不足！");
+    return;
+  }
+
+  if (!canUnlockTechnology(tech)) {
+    alert("尚未满足该科技的解锁条件。");
+    return;
+  }
+
+  researchPoints -= amount;
+  tech.progress += amount;
+
+  // 进度达标后升级；首次达到 Lv.1 时解锁
+  while (
+    tech.progress >= getTechnologyUpgradeCost(tech.level)
+  ) {
+    tech.progress -= getTechnologyUpgradeCost(tech.level);
+    tech.level += 1;
+
+    if (!tech.unlocked) {
+      tech.unlocked = true;
+      checkBreakthrough(tech);
+    }
+  }
+
+  renderGameStatus();
+  renderSubjects();
+  renderTechnologies();
+  renderDetails();
+}
+
+
 // 更新顶部的回合数和研究点
 function renderGameStatus() {
   document.getElementById("turn").textContent = currentTurn;
   document.getElementById("points").textContent = researchPoints;
+  document.getElementById("year").textContent = 1900 + currentTurn * 100;
 }
 
   // 找到网页中的显示区域
@@ -370,6 +468,7 @@ function renderSubjects() {
 }
 // 向基础学科投入研究点
 function investInSubject(subjectId, amount) {
+  if (gameEnded) return;
   const subject = subjects.find(
     (item) => item.id === subjectId
   );
@@ -400,11 +499,129 @@ function investInSubject(subjectId, amount) {
   renderDetails();
 }
 
-// 结束当前回合
+
+function getTechnologyLevel(id) {
+  const tech = technologies.find((item) => item.id === id);
+  return tech ? tech.level : 0;
+}
+
+// 统计十项目标科技中已解锁的数量
+function countUnlockedGoalTechnologies() {
+  const goalIds = [
+    "bci",
+    "embodied",
+    "arvr",
+    "spaceplane",
+    "gene",
+    "recycling",
+    "fusion",
+    "agi",
+    "quantum",
+    "sixg"
+  ];
+
+  return goalIds.filter(
+    (id) => getTechnologyLevel(id) >= 1
+  ).length;
+}
+
+// 根据最终科技状态判定文明结局
+function evaluateEnding() {
+  const bci = getTechnologyLevel("bci");
+  const embodied = getTechnologyLevel("embodied");
+  const arvr = getTechnologyLevel("arvr");
+  const spaceplane = getTechnologyLevel("spaceplane");
+  const gene = getTechnologyLevel("gene");
+  const recycling = getTechnologyLevel("recycling");
+  const fusion = getTechnologyLevel("fusion");
+  const agi = getTechnologyLevel("agi");
+  const quantum = getTechnologyLevel("quantum");
+  const sixg = getTechnologyLevel("sixg");
+
+  // 智能纪元
+  if (agi >= 1 && embodied >= 1) {
+    return {
+      title: "THE AGE OF INTELLIGENCE",
+      text: "智能终于跨越了实验室与现实世界之间的边界。AGI与具身智能共同改变了文明的生产、探索与决策方式。人类创造的新伙伴，将把未来带往何方？"
+    };
+  }
+
+  // 后人类时代
+  if (bci >= 1 && gene >= 1 && arvr >= 1) {
+    return {
+      title: "BEYOND HUMANITY",
+      text: "思维、基因与感知的边界逐渐消融。人类不再满足于继承自己的身体与认知，而是开始主动设计自身的未来。一个新的自我定义时代已经到来。"
+    };
+  }
+
+  // 恒星文明
+  if (fusion >= 1 && spaceplane >= 1 && recycling >= 1) {
+    return {
+      title: "THE STELLAR CIVILIZATION",
+      text: "稳定的清洁能源、可持续的资源循环与突破大气层的交通技术，打开了文明走向星际的大门。地球不再是人类想象力的边界。"
+    };
+  }
+
+  // 量子纪元
+  if (quantum >= 1 && sixg >= 1 && getTechnologyLevel("ai") >= 1) {
+    return {
+      title: "THE QUANTUM AGE",
+      text: "计算、通信与智能在新的技术基础上汇合。曾经难以触及的复杂系统逐渐变得可理解、可预测、可操纵。信息成为重塑文明秩序的核心力量。"
+    };
+  }
+
+  // 综合发展结局
+  if (countUnlockedGoalTechnologies() >= 6) {
+    return {
+      title: "A SYMPHONY OF CIVILIZATION",
+      text: "没有单一技术独自定义未来。能源、生命、智能、材料与信息领域彼此推动，逐渐形成相互支撑的技术体系。文明没有押注于唯一答案，而是拓宽了自身的选择。"
+    };
+  }
+
+  // 默认结局
+  return {
+    title: "AN UNFINISHED FUTURE",
+    text: "一个时代结束了，但文明尚未跨过决定命运的门槛。部分技术已经展现出改变世界的力量，更多可能性仍停留在研究之中。未来没有关闭，只是仍在等待下一次突破。"
+  };
+}
+
+// 展示最终结局
+function showEnding(ending) {
+  const overlay = document.getElementById("breakthrough-overlay");
+
+  document.querySelector(".breakthrough-title").textContent =
+    "CIVILIZATION OUTCOME";
+
+  document.getElementById("breakthrough-tech").textContent =
+    ending.title;
+
+  document.getElementById("breakthrough-text").textContent =
+    ending.text;
+
+  overlay.classList.add("active");
+}
+
+ // 结束当前回合
 document.getElementById("end-turn").addEventListener("click", () => {
+  if (gameEnded) return;
+
+  // 第10回合结束后，停止游戏推进
+  if (currentTurn >= 10) {
+  gameEnded = true;
+
+  const endTurnButton = document.getElementById("end-turn");
+  endTurnButton.disabled = true;
+  endTurnButton.textContent = "GAME ENDED";
+
+  const ending = evaluateEnding();
+  showEnding(ending);
+  return;
+}
+
+  // 进入下一回合
   currentTurn += 1;
 
-  // 上回合剩余研究点清零，新回合固定获得 10 点
+  // 上回合剩余研究点清零，新回合固定获得10点
   researchPoints = 10;
 
   renderGameStatus();
@@ -412,6 +629,7 @@ document.getElementById("end-turn").addEventListener("click", () => {
   renderTechnologies();
   renderDetails();
 });
+
   // 动态显示科技网络
   function renderTechnologies() {
     techMap.innerHTML = "";
@@ -426,9 +644,12 @@ document.getElementById("end-turn").addEventListener("click", () => {
       }
 
       node.innerHTML = `
-        <span>${tech.name}</span>
-        <span class="tech-type">${tech.type}</span>
-      `;
+  <span>${tech.name}</span>
+  <span class="tech-type">${tech.type}</span>
+  <span class="tech-level">
+    ${tech.unlocked ? "LV." + tech.level : "LOCKED"}
+  </span>
+`;
 
       node.addEventListener("click", () => {
         selectedNodeId = tech.id;
@@ -440,54 +661,84 @@ document.getElementById("end-turn").addEventListener("click", () => {
       techMap.appendChild(node);
     });
   }
-  function showBreakthrough(eventID){
+ 
 
 
-  const event =
-  breakthroughEvents[eventID];
+function checkBreakthrough(tech){
+
+  const eventMap={
+
+    agi:"agi",
+
+    quantum:"quantum",
+
+    fusion:"fusion",
+
+    bci:"bci",
+
+    embodied:"embodiment"
+
+  };
 
 
-  if(!event){
+  const eventId =
+  eventMap[tech.id];
+
+
+  if(!eventId){
     return;
   }
 
 
-  document.getElementById(
-    "breakthrough-tech"
-  ).innerText =
-  event.title;
+  if(triggeredBreakthroughs[eventId]){
+    return;
+  }
 
 
-
-  document.getElementById(
-    "breakthrough-text"
-  ).innerText =
-  event.text;
+  triggeredBreakthroughs[eventId]=true;
 
 
+  showBreakthrough(eventId);
 
-  const overlay =
-  document.getElementById(
-  "breakthrough-overlay"
-  );
+}
+function showBreakthrough(eventId){
 
-
-  overlay.classList.add(
-  "active"
-  );
+    const event =
+    breakthroughEvents[eventId];
 
 
+    if(!event){
+        return;
+    }
 
-  setTimeout(()=>{
 
-
-    overlay.classList.remove(
-    "active"
+    const overlay =
+    document.getElementById(
+    "breakthrough-overlay"
     );
 
 
-  },3000);
+    document.getElementById(
+    "breakthrough-tech"
+    ).innerHTML =
+    event.title;
 
+
+
+    document.getElementById(
+    "breakthrough-text"
+    ).innerHTML =
+    event.text;
+
+
+    overlay.classList.add("active");
+
+
+    setTimeout(()=>{
+
+        overlay.classList.remove("active");
+
+    },3000);
 
 }
 
@@ -521,75 +772,72 @@ document.getElementById("end-turn").addEventListener("click", () => {
       return;
     }
 
-    if (tech) {
-      details.innerHTML = `
-        <div class="detail-name">${tech.name}</div>
-        <div class="detail-line">类型：${tech.type}</div>
-        <div class="detail-line">当前等级：尚未开始</div>
-        <div class="detail-line">
-          <strong>解锁条件</strong>
-        </div>
-        <ul>
-          ${tech.conditions.map(
-            (condition) => `<li>${condition}</li>`
-          ).join("")}
-        </ul>
-      `;
-    }
+    
+if (tech) {
+  const eligible = canUnlockTechnology(tech);
+  const upgradeCost = getTechnologyUpgradeCost(tech.level);
+
+  let statusText;
+
+  if (tech.unlocked) {
+    statusText = "已解锁";
+  } else if (eligible) {
+    statusText = "可以开始研究";
+  } else {
+    statusText = "前置条件未满足";
   }
+
+  details.innerHTML = `
+    <div class="detail-name">${tech.name}</div>
+    <div class="detail-line">类型：${tech.type}</div>
+    <div class="detail-line">状态：${statusText}</div>
+    <div class="detail-line">当前等级：Lv.${tech.level}</div>
+    <div class="detail-line">
+      研究进度：${tech.progress} / ${upgradeCost}
+    </div>
+    <div class="detail-line"><strong>解锁条件</strong></div>
+    <ul>
+      ${tech.conditions.map(
+        (condition) => `<li>${condition}</li>`
+      ).join("")}
+    </ul>
+    ${
+      eligible
+        ? `
+          <div class="detail-actions">
+            <button type="button" id="tech-invest-one">投入 1 点</button>
+            <button type="button" id="tech-invest-five">投入 5 点</button>
+          </div>
+        `
+        : `<p class="muted">请先发展所需学科或前置科技。</p >`
+    }
+  `;
+
+  const oneButton = document.getElementById("tech-invest-one");
+  const fiveButton = document.getElementById("tech-invest-five");
+
+  if (oneButton) {
+    oneButton.addEventListener("click", () => {
+      investInTechnology(tech.id, 1);
+    });
+  }
+
+  if (fiveButton) {
+    fiveButton.addEventListener("click", () => {
+      investInTechnology(tech.id, 5);
+    });
+  }
+}
+
+  } 
 
     // 初始化页面
   renderGameStatus();
   renderSubjects();
   renderTechnologies();
   renderDetails();
-function showBreakthrough(){
-
-    const overlay =
-    document.getElementById(
-    "breakthrough-overlay"
-    );
 
 
-    const tech =
-    document.getElementById(
-    "breakthrough-tech"
-    );
-
-
-    const text =
-    document.getElementById(
-    "breakthrough-text"
-    );
-
-
-    tech.innerHTML =
-    "ARTIFICIAL GENERAL INTELLIGENCE";
-
-
-    text.innerHTML =
-    `
-    新时代的序幕已经开启。<br><br>
-
-    人类第一次创造出能够跨越领域、
-    持续学习并自主解决复杂问题的智能系统。<br><br>
-
-    AI时代结束。<br><br>
-
-    AGI时代开始。
-    `;
-
-
-    overlay.classList.add("active");
-
-
-    setTimeout(()=>{
-
-        overlay.classList.remove("active");
-
-    },3000);
-
-}
 </script>
 </body>
 </html>

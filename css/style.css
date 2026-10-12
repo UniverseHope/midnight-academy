@@ -941,3 +941,14 @@
 
 
 }
+.tech-level {
+  display: block;
+  margin-top: 8px;
+  color: #78efff;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.tech-node:not(.selected) .tech-level {
+  opacity: 0.75;
+}
