@@ -6,217 +6,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Midnight Academy</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: #101827;
-      color: #e8edff;
-      font-family: "Segoe UI", Arial, sans-serif;
-    }
-
-    button {
-      border: 1px solid #485b80;
-      border-radius: 7px;
-      padding: 8px 10px;
-      background: #293954;
-      color: #edf1ff;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #3a4d70;
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      padding: 20px 24px;
-      border-bottom: 1px solid #293650;
-    }
-
-    .brand {
-      margin: 0;
-      color: #c7d2fe;
-      font-size: 24px;
-    }
-
-    .subtitle,
-    .muted {
-      color: #aab7d4;
-      font-size: 13px;
-    }
-
-    .turn-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .notice {
-      margin: 18px 24px;
-      padding: 14px 16px;
-      border: 1px solid #394c70;
-      border-radius: 10px;
-      background: #182338;
-      color: #c7d2fe;
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(190px, 0.85fr)
-                             minmax(280px, 1.4fr)
-                             minmax(200px, 0.9fr);
-      gap: 16px;
-      padding: 0 24px 24px;
-    }
-
-    .panel {
-      min-width: 0;
-      padding: 16px;
-      border: 1px solid #293650;
-      border-radius: 12px;
-      background: #151f31;
-    }
-
-    .panel h2 {
-      margin: 0 0 14px;
-      font-size: 17px;
-      color: #dbe4ff;
-    }
-
-    .subject-card,
-    .tech-node {
-      margin-bottom: 9px;
-      padding: 12px;
-      border: 1px solid #354563;
-      border-radius: 8px;
-      background: #1c2a40;
-    }
-
-    .subject-name {
-      font-weight: 600;
-    }
-
-    .level {
-      margin-top: 5px;
-      color: #aab7d4;
-      font-size: 12px;
-    }
-
-    .subject-card button {
-      width: 100%;
-      margin-top: 10px;
-    }
-
-    .tech-map {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .tech-node {
-      margin: 0;
-      min-height: 64px;
-      text-align: center;
-      color: #dce5ff;
-      cursor: pointer;
-    }
-
-    .tech-node.locked {
-      opacity: 0.55;
-      border-style: dashed;
-    }
-
-    .tech-node.selected {
-      border-color: #a5b4fc;
-      background: #303e60;
-      box-shadow: 0 0 0 1px #a5b4fc;
-    }
-
-    .tech-type {
-      display: block;
-      margin-top: 6px;
-      color: #aab7d4;
-      font-size: 11px;
-    }
-
-    .detail-name {
-      margin: 8px 0 14px;
-      font-size: 22px;
-      color: #c7d2fe;
-    }
-
-    .detail-line {
-      margin: 12px 0;
-      color: #c5cee3;
-      font-size: 14px;
-    }
-
-    .detail-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 18px;
-    }
-
-    .footer {
-      padding: 16px 24px;
-      border-top: 1px solid #293650;
-      color: #8493b4;
-      font-size: 12px;
-    }
-
-    @media (max-width: 900px) {
-      .layout {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .detail-panel {
-        grid-column: 1 / -1;
-      }
-    }
-
-    @media (max-width: 560px) {
-      .layout {
-        grid-template-columns: 1fr;
-        padding: 0 14px 18px;
-      }
-
-      .notice {
-        margin: 14px;
-      }
-
-      .topbar {
-        padding: 16px;
-      }
-
-      .detail-panel {
-        grid-column: auto;
-      }
-    }
-  </style>
+<link rel="stylesheet" href="css/style.css">
 </head>
 
-<body>
+<<body>
+
   <header class="topbar">
-    <div>
-      <h1 class="brand">The Midnight Academy</h1>
-      <div class="subtitle">午夜学院 · 科技研究网络</div>
+
+    <div class="academy-title">
+
+      <h1 class="brand">
+        THE MIDNIGHT ACADEMY
+      </h1>
+
+      <div class="subtitle">
+        TECHNOLOGY EVOLUTION SIMULATION
+      </div>
+
     </div>
 
+
     <div class="turn-info">
-      <span>第 <strong id="turn">1</strong> 回合</span>
-      <span>研究点：<strong id="points">10</strong></span>
-      <button id="end-turn">结束回合</button>
+
+      <span>
+        YEAR <strong id="year">2100</strong>
+      </span>
+
+      <span>
+        ROUND <strong id="turn">1</strong>/10
+      </span>
+
+      <span>
+        RESEARCH POINTS：
+        <strong id="points">10</strong>
+      </span>
+
+      <button id="end-turn">
+        END TURN
+      </button>
+
     </div>
+
+
   </header>
 
   <div class="notice">
@@ -264,36 +96,48 @@
       id: "materials",
       name: "材料科学",
       type: "跨学科研究",
+      x:50,
+      y:10,
       conditions: ["物理学 Lv.2", "化学 Lv.2"]
     },
     {
       id: "ai",
       name: "人工智能",
       type: "跨学科研究",
+      x:45,
+      y:25,
       conditions: ["数学 Lv.2", "计算机科学 Lv.2"]
     },
     {
       id: "bci",
       name: "脑机接口",
       type: "目标科技",
+      x:20,
+      y:45,
       conditions: ["生物学 Lv.2", "电子与控制工程 Lv.2"]
     },
     {
       id: "embodied",
       name: "具身智能",
       type: "目标科技",
+      x:45,
+      y:45,
       conditions: ["人工智能", "电子与控制工程 Lv.2"]
     },
     {
       id: "arvr",
       name: "AR/VR",
       type: "目标科技",
+      x:70,
+      y:45,
       conditions: ["计算机科学 Lv.2", "电子与控制工程 Lv.2"]
     },
     {
       id: "spaceplane",
       name: "空天飞机",
       type: "目标科技",
+      x:80,
+      y:75,
       conditions: [
         "数学 Lv.2",
         "物理学 Lv.2",
@@ -305,18 +149,24 @@
       id: "gene",
       name: "基因治疗 / 改进",
       type: "目标科技",
+      x:20,
+      y:75,
       conditions: ["生物学 Lv.2", "化学 Lv.2"]
     },
     {
       id: "recycling",
       name: "资源再生",
       type: "目标科技",
+      x:55,
+      y:75,
       conditions: ["化学 Lv.2", "计算机科学 Lv.2"]
     },
     {
       id: "fusion",
       name: "可控核聚变",
       type: "目标科技",
+      x:75,
+      y:25,
       conditions: [
         "物理学 Lv.2",
         "化学 Lv.2",
@@ -328,12 +178,16 @@
       id: "agi",
       name: "通用人工智能（AGI）",
       type: "目标科技",
+      x:45,
+      y:5,
       conditions: ["数学 Lv.3", "计算机科学 Lv.3", "人工智能 Lv.2"]
     },
     {
       id: "quantum",
       name: "量子科技",
       type: "目标科技",
+      x:25,
+      y:20,
       conditions: [
         "数学 Lv.2",
         "物理学 Lv.2",
@@ -345,6 +199,8 @@
       id: "sixg",
       name: "6G",
       type: "目标科技",
+      x:70,
+      y:20,
       conditions: [
         "数学 Lv.2",
         "物理学 Lv.2",
@@ -473,11 +329,14 @@ document.getElementById("end-turn").addEventListener("click", () => {
       const node = document.createElement("button");
       node.type = "button";
       node.className = "tech-node";
+      node.style.position = "absolute"
 
       if (selectedNodeId === tech.id) {
         node.classList.add("selected");
       }
-
+      node.style.left = tech.x + "%";
+      node.style.top = tech.y + "%";
+      node.style.transform = "translate(-50%, -50%)";
       node.innerHTML = `
         <span>${tech.name}</span>
         <span class="tech-type">${tech.type}</span>
