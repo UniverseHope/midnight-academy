@@ -96,8 +96,6 @@
       id: "materials",
       name: "材料科学",
       type: "跨学科研究",
-      x:50,
-      y:10,
       conditions: ["物理学 Lv.2", "化学 Lv.2"]
     },
     {
@@ -112,32 +110,24 @@
       id: "bci",
       name: "脑机接口",
       type: "目标科技",
-      x:20,
-      y:45,
       conditions: ["生物学 Lv.2", "电子与控制工程 Lv.2"]
     },
     {
       id: "embodied",
       name: "具身智能",
       type: "目标科技",
-      x:45,
-      y:45,
       conditions: ["人工智能", "电子与控制工程 Lv.2"]
     },
     {
       id: "arvr",
       name: "AR/VR",
       type: "目标科技",
-      x:70,
-      y:45,
       conditions: ["计算机科学 Lv.2", "电子与控制工程 Lv.2"]
     },
     {
       id: "spaceplane",
       name: "空天飞机",
       type: "目标科技",
-      x:80,
-      y:75,
       conditions: [
         "数学 Lv.2",
         "物理学 Lv.2",
@@ -149,24 +139,18 @@
       id: "gene",
       name: "基因治疗 / 改进",
       type: "目标科技",
-      x:20,
-      y:75,
       conditions: ["生物学 Lv.2", "化学 Lv.2"]
     },
     {
       id: "recycling",
       name: "资源再生",
       type: "目标科技",
-      x:55,
-      y:75,
       conditions: ["化学 Lv.2", "计算机科学 Lv.2"]
     },
     {
       id: "fusion",
       name: "可控核聚变",
       type: "目标科技",
-      x:75,
-      y:25,
       conditions: [
         "物理学 Lv.2",
         "化学 Lv.2",
@@ -178,16 +162,12 @@
       id: "agi",
       name: "通用人工智能（AGI）",
       type: "目标科技",
-      x:45,
-      y:5,
       conditions: ["数学 Lv.3", "计算机科学 Lv.3", "人工智能 Lv.2"]
     },
     {
       id: "quantum",
       name: "量子科技",
       type: "目标科技",
-      x:25,
-      y:20,
       conditions: [
         "数学 Lv.2",
         "物理学 Lv.2",
@@ -199,8 +179,6 @@
       id: "sixg",
       name: "6G",
       type: "目标科技",
-      x:70,
-      y:20,
       conditions: [
         "数学 Lv.2",
         "物理学 Lv.2",
@@ -334,9 +312,7 @@ document.getElementById("end-turn").addEventListener("click", () => {
       if (selectedNodeId === tech.id) {
         node.classList.add("selected");
       }
-      node.style.left = tech.x + "%";
-      node.style.top = tech.y + "%";
-      node.style.transform = "translate(-50%, -50%)";
+      
       node.innerHTML = `
         <span>${tech.name}</span>
         <span class="tech-type">${tech.type}</span>
