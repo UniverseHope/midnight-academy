@@ -11,7 +11,72 @@
 </head>
 
 <body>
+  
+<!-- 开场界面 -->
+<section id="intro-screen" class="intro-screen">
+  <div class="intro-grid"></div>
 
+  <!-- 两侧科技书架 -->
+  <div class="shelf shelf-left">
+    <div class="shelf-row"></div>
+    <div class="shelf-row"></div>
+    <div class="shelf-row"></div>
+    <div class="shelf-row"></div>
+  </div>
+
+  <div class="shelf shelf-right">
+    <div class="shelf-row"></div>
+    <div class="shelf-row"></div>
+    <div class="shelf-row"></div>
+    <div class="shelf-row"></div>
+  </div>
+
+  <!-- 中央强光 -->
+  <div class="intro-light"></div>
+
+  <!-- 飞出的数据书籍 -->
+  <div class="data-book book-1">NEURAL INTERFACE</div>
+  <div class="data-book book-2">QUANTUM ARCHIVE</div>
+  <div class="data-book book-3">GENE EDIT // 07</div>
+  <div class="data-book book-4">AGI RESEARCH</div>
+  <div class="data-book book-5">MATERIALS DATA</div>
+  <div class="data-book book-6">6G PROTOCOL</div>
+
+  <!-- 开场标题 -->
+  <div class="intro-content">
+    <div class="intro-emblem">✳</div>
+
+    <p class="intro-eyebrow">ADVANCED RESEARCH INSTITUTE</p >
+
+    <h1 class="intro-title">
+      THE MIDNIGHT<br />
+      ACADEMY
+    </h1>
+
+    <p class="intro-subtitle">
+      CIVILIZATION TECHNOLOGY DEVELOPMENT
+    </p >
+
+    <p class="intro-years">SIMULATION 2100 — 3100</p >
+
+    <button id="start-game" class="start-button">
+      <span>ϟ</span>
+      开始模拟 / ENTER ACADEMY
+    </button>
+
+    <p class="intro-hint">KNOWLEDGE IS THE FUTURE</p >
+  </div>
+
+  <div class="intro-status intro-status-left">
+    SEC_CORE: ACTIVE_PROTOCOL
+  </div>
+
+  <div class="intro-status intro-status-right">
+    SECURE_NODE_99
+  </div>
+</section>
+
+<div id="game-screen" hidden>
   <header class="topbar">
 
     <div class="academy-title">
@@ -83,6 +148,7 @@ TEST BREAKTHROUGH
   <footer class="footer">
     The Midnight Academy · 互动研究原型
 </footer>
+</div>
 
 
 <!-- 科技突破事件窗口 -->
@@ -107,7 +173,36 @@ TEST BREAKTHROUGH
     </div>
 
 </div>
+<!-- 模拟结束界面 -->
+<section id="ending-screen" class="ending-screen" hidden>
+  <div class="ending-panel">
+    <p class="ending-eyebrow">SIMULATION COMPLETE</p >
 
+    <div class="ending-symbol">✧</div>
+
+    <h1>ACADEMY REPORT</h1>
+    <p class="ending-title">模拟结束</p >
+
+    <p class="ending-description">
+      一个时代已经结束。你的研究将决定文明的下一步。
+    </p >
+
+    <div class="ending-stats">
+      <div>
+        <span>FINAL YEAR</span>
+        <strong id="final-year">3100</strong>
+      </div>
+      <div>
+        <span>ROUNDS</span>
+        <strong id="final-round">10</strong>
+      </div>
+    </div>
+
+    <button id="return-home" class="start-button">
+      ↶ 返回首页 / RETURN
+    </button>
+  </div>
+</section>
 <script>
  const breakthroughEvents = {
 
@@ -198,7 +293,8 @@ TEST BREAKTHROUGH
 };
 // 已触发突破事件记录
 const triggeredBreakthroughs = {};
- const subjects = [
+
+const subjects = [
   { id: "math", name: "数学", level: 1, progress: 0 },
   { id: "physics", name: "物理学", level: 1, progress: 0 },
   { id: "cs", name: "计算机科学", level: 1, progress: 0 },
@@ -206,6 +302,7 @@ const triggeredBreakthroughs = {};
   { id: "chemistry", name: "化学", level: 1, progress: 0 },
   { id: "control", name: "电子与控制工程", level: 1, progress: 0 }
 ];
+
 
   // 跨学科研究与十项目标科技
   const technologies = [
@@ -310,13 +407,12 @@ technologies.forEach((tech) => {
   tech.unlocked = false;
 });
 
-  // 当前选中的研究节点
-  let selectedNodeId = "math";
-  // 游戏回合状态
+ // 当前选中的研究节点
+let selectedNodeId = "math";
+ // 游戏回合状态：每个变量只声明一次
 let currentTurn = 1;
 let researchPoints = 10;
 let gameEnded = false;
-
 // 学科升级所需进度
 function getUpgradeCost(level) {
   return level === 1 ? 8 : 12;
@@ -586,42 +682,67 @@ function evaluateEnding() {
 }
 
 // 展示最终结局
+
 function showEnding(ending) {
+  // 隐藏原有的结局弹窗，避免两个结局界面重叠
   const overlay = document.getElementById("breakthrough-overlay");
 
-  document.querySelector(".breakthrough-title").textContent =
-    "CIVILIZATION OUTCOME";
+  if (overlay) {
+    overlay.classList.remove("active");
+  }
 
-  document.getElementById("breakthrough-tech").textContent =
-    ending.title;
+  // 将本局结局信息写入新的结算界面
+  const endingTitle = document.querySelector(".ending-title");
+  const endingDescription = document.querySelector(".ending-description");
 
-  document.getElementById("breakthrough-text").textContent =
-    ending.text;
+  if (endingTitle) {
+    endingTitle.textContent = ending.title;
+  }
 
-  overlay.classList.add("active");
+  if (endingDescription) {
+    endingDescription.textContent = ending.text;
+  }
+
+  // 显示新的结算界面
+  showEndingScreen();
 }
+
+
+ 
 
  // 结束当前回合
 document.getElementById("end-turn").addEventListener("click", () => {
   if (gameEnded) return;
 
-  // 第10回合结束后，停止游戏推进
-  if (currentTurn >= 10) {
-  gameEnded = true;
-
   const endTurnButton = document.getElementById("end-turn");
-  endTurnButton.disabled = true;
-  endTurnButton.textContent = "GAME ENDED";
 
-  const ending = evaluateEnding();
-  showEnding(ending);
-  return;
-}
+  // 第 10 回合结束：结算并结束游戏
+  if (currentTurn >= 10) {
+    gameEnded = true;
 
-  // 进入下一回合
-  currentTurn += 1;
+    // 确保最终状态显示第 10 回合、3000 年
+    currentTurn = 10;
+    renderGameStatus();
 
-  // 上回合剩余研究点清零，新回合固定获得10点
+    endTurnButton.disabled = true;
+    endTurnButton.textContent = "GAME ENDED";
+
+    const ending = evaluateEnding();
+
+    // 写入结局内容并显示结算界面
+    showEnding(ending);
+
+    // 更新结算界面的最终年份和回合数
+    document.getElementById("final-year").textContent =
+      document.getElementById("year").textContent;
+
+    document.getElementById("final-round").textContent = currentTurn;
+
+    return;
+  }
+
+  // 尚未到第 10 回合：进入下一回合
+  currentTurn++;
   researchPoints = 10;
 
   renderGameStatus();
@@ -629,6 +750,10 @@ document.getElementById("end-turn").addEventListener("click", () => {
   renderTechnologies();
   renderDetails();
 });
+
+
+
+
 
   // 动态显示科技网络
   function renderTechnologies() {
@@ -838,7 +963,46 @@ if (tech) {
   renderDetails();
 
 
+/* =========================================
+   开场、游戏、结算界面的切换
+   请放在原有 script 的末尾
+   ========================================= */
+
+const introScreen = document.getElementById("intro-screen");
+const gameScreen = document.getElementById("game-screen");
+const endingScreen = document.getElementById("ending-screen");
+
+// 点击开始：进入游戏
+document.getElementById("start-game").addEventListener("click", () => {
+  introScreen.hidden = true;
+  endingScreen.hidden = true;
+  gameScreen.hidden = false;
+});
+
+// 点击返回：首页重新显示开场界面
+document.getElementById("return-home").addEventListener("click", () => {
+  endingScreen.hidden = true;
+  gameScreen.hidden = true;
+  introScreen.hidden = false;
+});
+
+// 显示模拟结束界面
+function showEndingScreen() {
+  gameScreen.hidden = true;
+  introScreen.hidden = true;
+  endingScreen.hidden = false;
+
+  document.getElementById("final-year").textContent =
+    document.getElementById("year").textContent;
+
+  document.getElementById("final-round").textContent = "10";
+}
+
 </script>
+
+
+
+
 </body>
 </html>
 
